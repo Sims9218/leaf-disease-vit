@@ -80,7 +80,17 @@ def main():
 
     dataset_path = download_cotton_dataset()
     
-    data_dir = os.path.join(dataset_path, "Augmented Dataset") 
+    data_dir = None
+    for root, dirs, files in os.walk(dataset_path):
+        if "Augmented Dataset" in dirs:
+            data_dir = os.path.join(root, "Augmented Dataset")
+            break
+            
+    if data_dir is None:
+        print(f"Contents of downloaded path: {os.listdir(dataset_path)}")
+        raise FileNotFoundError("Could not find 'Augmented Dataset' folder. Check the printed contents above.")
+    
+    print(f"✅ Found dataset directory at: {data_dir}")
 
     transform_train = transforms.Compose([
         transforms.Resize(256),
