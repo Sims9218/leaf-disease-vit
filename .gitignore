@@ -1,8 +1,0 @@
-# Ignore the dataset folder
-dataset/
-__pycache__/
-*.pyc
-
-# Ignore the heavy model weights during intermediate training
-*.pth
-!best_model.pth
