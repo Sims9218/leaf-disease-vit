@@ -3,9 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import cv2
-import timm
 from einops import rearrange
 from einops.layers.torch import Rearrange
+import timm
 
 class RobustEdgeDetectionModule(nn.Module):
     def __init__(self, mode='sobel'):
@@ -22,7 +22,7 @@ class RobustEdgeDetectionModule(nn.Module):
     def forward(self, x):
         if x is None:
             raise ValueError("Input tensor is None")
-            
+
         B, C, H, W = x.shape
 
         if self.mode == 'sobel':
@@ -44,8 +44,9 @@ class RobustEdgeDetectionModule(nn.Module):
                     edge_maps.append(edges)
                 except Exception:
                     edge_maps.append(torch.zeros(C, H, W, device=x.device))
+
             edge_map = torch.stack(edge_maps)
-            
+
         return edge_map
 
 class SafeCrossAttention(nn.Module):
@@ -78,6 +79,7 @@ class SafeCrossAttention(nn.Module):
 class RobustAttentionGuidedEdgeViT(nn.Module):
     def __init__(self, num_classes=7, edge_mode='sobel', pretrained=True, vit_model='vit_base_patch16_224'):
         super().__init__()
+
         self.edge_detector = RobustEdgeDetectionModule(mode=edge_mode)
         self.vit = timm.create_model(vit_model, pretrained=pretrained)
         self.embed_dim = self.vit.embed_dim
@@ -104,6 +106,7 @@ class RobustAttentionGuidedEdgeViT(nn.Module):
             raise ValueError("Model input cannot be None")
 
         edge_maps = self.edge_detector(x)
+
         rgb_features = self.vit.forward_features(x)
 
         edge_tokens = self.edge_patch_embed(edge_maps)
